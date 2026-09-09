@@ -16,34 +16,45 @@ import Mathlib.Tactic
 variable (P Q R: Prop)
 
 -- Example 1: Using apply to Transform a Goal
-lemma piq (h: P → Q)(h2: P): Q := by
+lemma piq (h : P → Q) (h2 : P) : Q := by
   apply h
   exact h2
 
 -- Example 2: Using apply with Existing Assumptions
-example (h: P → Q)(h2: P): Q := by
+example (h : P → Q) (h2 : P) : Q := by
   apply h at h2
   trivial
 
-example (h: P → Q)(h2: Q → R): P → R := by sorry
+example (h : P → Q) (h2 : P) : Q := h h2
 
+example (h : P → Q) (h2: Q → R) : P → R := by
+  intro hp
+  have hq := h hp
+  have hr := h2 hq
+  assumption
 
 /-!
 ## `apply` is flexible
-The apply tactic in Lean can be used not only to transform goals but also to produce subgoals when the hypothesis you are applying has multiple premises.
-This is often the case when you have implications or functions that require more than one argument.
+The apply tactic in Lean can be used not only to transform goals but also to
+produce subgoals when the hypothesis you are applying has multiple premises.
+This is often the case when you have implications or functions that require more
+than one argument.
 -/
-example {S: Prop} (h0: P ∧ Q ∧ R)(h: P → Q → R → S): S := by sorry
 
-example {S}: P → Q → R → S ↔ ((P ∧ Q ∧ R) → S) := by tauto
+example {S: Prop} (h0 : P ∧ Q ∧ R) (h : P → Q → R → S) : S := by
+  obtain ⟨hp, hq, hr⟩ := h0
+  exact h hp hq hr
+
+example {S}: P → Q → R → S ↔ ((P ∧ Q ∧ R) → S) := by
+  tauto
 
 /-!
 ## More examples
 -/
 #check lt_trans
+
 example (x y z : ℝ) (hab : x < y) (hbc: y < z) : x < z := by
-  apply lt_trans
-  all_goals sorry
+  apply lt_trans hab hbc
 
 example (a b c : ℝ) (hab : a < b) (hbc: b < c) : a < c := by
   trans b

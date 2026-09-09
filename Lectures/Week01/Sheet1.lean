@@ -18,12 +18,18 @@ We can think of `type` as a collection of objects and `term` as an object/data p
 Let's define some constant
 -/
 
+opaque m : ℕ
+#eval m
+
 def n : ℕ := 100 -- n has type ℕ with specific value of 100
+#eval n + 10
+
 def z : ℚ := -0.1
 
 def P1 : Prop := 1 = 1 -- P has type proposition, and its term is 1 = 1
 def Q1 : Prop := 1 ≠ 1
 
+#check 1 < 2
 
 /-!
 ## How to state a theorem in Lean
@@ -46,6 +52,7 @@ theorem one_eq_one': P1 := sorry
 
 -- another example
 theorem x_pos (x : ℤ) (h: 1 < x) : 0 ≤ x := sorry
+
 #check x_pos
 
 /-!
@@ -71,13 +78,20 @@ variable (P Q: Prop)
 example : P = P := rfl
 example : 2 + 1 + 1 = 4 := rfl
 
-example : P → P := by sorry
+example : P → P :=
+  fun x ↦ x
 
-example : P → (Q → P) := by sorry
+example : P → (Q → P) :=
+  fun hp _hq ↦ hp
 
-example (hP: P) (hQ: Q) : P ∧ Q := by sorry
+example (hP: P) (hQ: Q) : P ∧ Q := by
+  constructor
+  all_goals assumption
 
 example: P ∧ Q ↔ Q ∧ P:= by
   constructor
-  · sorry
-  · sorry
+  · intro h
+    exact And.intro h.2 h.1
+  · intro h
+    obtain ⟨hq, hp⟩ := h
+    exact ⟨hp, hq⟩
