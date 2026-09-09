@@ -26,14 +26,13 @@ set_option tactic.hygienic false
     This is because, in Lean, ∀ x : N, P(x) is equivalent to (x :ℕ) →  P(x)
 -/
 
-def f (x :ℕ) := x = 0
-#check f
+def f (x : ℕ) := x = 0
+
 example : (∀ x : ℕ, f x) ↔ ((x : ℕ) → f x) := by rfl
 
 example : ∀ n : ℕ, n + 0 = n := by
-  intro n
+  intro b
   rfl
-
 
 /-! tactics for working with the existential quantifier
 * `use` -- The use tactic is used to provide a witness for an existential statement: ∃ x, P x
@@ -43,30 +42,47 @@ example : ∀ n : ℕ, n + 0 = n := by
            -- Use obtain ⟨a, ⟨b, c⟩⟩ := h for nested existentials
 -/
 
-example : ∃ n : ℕ, n + 3 = 7 := by sorry
-example : ∃ n m : ℕ, n + m = 5 := by sorry
+#check (fun x => x + 3 = 7) 4
+
+example : ∃ n : ℕ, n + 3 = 7 := by
+  apply Exists.intro 4
+  rfl
+
+example : ∃ n : ℕ, n + 3 = 7 := by
+  use 4
+
+example : ∃ n m : ℕ, n + m = 5 := by
+  use 2
+  use 3
 
 -- Definition of an even number.
 def IsEven (n : ℤ) : Prop := ∃ k, n = 2 * k
 
 -- If there exists an even number `n` that is greater than 10,
 -- then there must exist some integer `m` that is greater than 5.
-example (h : ∃ n : ℤ, IsEven n ∧ n > 10) : ∃ m : ℤ, m > 5 := by
+theorem lixo (h : ∃ n : ℤ, IsEven n ∧ n > 10) : ∃ m : ℤ, m > 5 := by
   -- Use `obtain` to get the number `n` and its properties from `h`.
-  -- The syntax is: obtain ⟨n, hn_prop⟩ := h
-  sorry
-
+  -- The syntax is: `obtain ⟨n, hn_prop⟩ := h`
+  obtain ⟨b, hb⟩ := h
+  use b
+  have h₁ := hb.2
+  linarith
 
 def IsOdd (n : ℤ) : Prop := ∃ k, n = 2 * k + 1
 
-example (n:ℤ) (h : IsEven n) :  IsOdd (n+1) := by
+example (n : ℤ) (h : IsEven n) :  IsOdd (n + 1) := by
   unfold IsOdd
   unfold IsEven at h
-  obtain ⟨k,hk⟩ := h
-  use k
-  rw [hk]
+  obtain ⟨a,ha⟩ := h
+  use a
+  rw [ha]
 
 
 -- Exercise 0. Prove that the sum of two even numbers is even.
-example (a b:ℤ) (h_a : IsEven a) (h_b : IsEven b) : IsEven (a + b) := by
-  sorry
+example (a b : ℤ) (ha : IsEven a) (hb : IsEven b) : IsEven (a + b) := by
+  unfold IsEven at ha hb
+  obtain ⟨x,hx⟩ := ha
+  obtain ⟨y,hy⟩ := hb
+  use (x + y)
+  rw [hx,hy]
+  linarith
