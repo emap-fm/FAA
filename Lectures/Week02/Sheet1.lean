@@ -57,22 +57,28 @@ example : S1 ⊆ S2 := by simp only [S1, S2, singleton_subset_iff, mem_insert_if
 -- Remark: FROM NOW ON 'SIMP' IS NOT ALLOWED ---
 
 /-! For technical details
- (1) def Set (α : Type u) := α → Prop. So a set of elements of type α is just a boolean function α → Prop
-     saying whether an element belongs.
- (2) Membership is defined as:
-     def Set.Mem (x : α) (s : Set α) : Prop := s x
-     So x ∈ s is syntactic sugar for s x
+
+ (1) def Set (α : Type u) := α → Prop. So a set of elements of type α is just a
+     boolean function α → Prop saying whether an element belongs.
+
+ (2) Membership is defined as: def Set.Mem (x : α) (s : Set α) : Prop := s x So
+     x ∈ s is syntactic sugar for s x
 -/
 example: (10 ∈ S1) = (S1 10) := by rfl
 
 --  (3) How to define an emptyset?
-def my_emptyset : Set ℕ := sorry
-example: my_emptyset = ∅  := by sorry -- rfl should be enough
+def my_emptyset : Set ℕ :=
+  fun _ => False
+
+example: my_emptyset = ∅ :=
+  by rfl
 
 --  (4) How to define a universe set?
-def my_univ : Set ℕ := fun _ ↦ True
-example: my_univ = univ := by sorry
+def my_univ : Set ℕ :=
+  fun _ ↦ True
 
+example: my_univ = univ :=
+  by rfl
 
 variable {α : Type*}
 variable (A B C D: Set α)
@@ -99,9 +105,27 @@ example : A ∩ B ⊆ B := by
 
 -- Exercise 1: resolve the sorry
 #check subset_def
-example : A ⊆ B → B ⊆ C → A ⊆ C := sorry
+
+example : A ⊆ B → B ⊆ C → A ⊆ C := by
+  intro h1 h2
+  intro x hx
+  exact h2 <| h1 hx
+
+example : A ⊆ B → B ⊆ C → A ⊆ C := by
+  intro h1 h2
+  trans B
+  all_goals assumption
+
 
 -- Exercise 2:  More exercises
 #check Set.inter_def
-example : A ∩ B ⊆ B := by sorry
-example : A ⊆ B → A ⊆ C → A ⊆ B ∩ C := by sorry
+
+example : A ∩ B ⊆ B := by
+  intro x hx
+  exact hx.2
+
+
+example : A ⊆ B → A ⊆ C → A ⊆ B ∩ C := by
+  intro h1 h2
+  intro x hx
+  exact ⟨(h1 hx), (h2 hx)⟩

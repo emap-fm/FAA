@@ -9,7 +9,6 @@ import Mathlib.Tactic -- imports all of the tactics in Lean's maths library
 set_option autoImplicit false
 set_option tactic.hygienic false
 
-
 /-!
 ## Universal quantifier (∀) and Existential (∃) Quantifiers
 * `∀ x : α, P x` means for every element x of type α, the property P x holds.
