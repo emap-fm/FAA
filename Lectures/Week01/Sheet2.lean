@@ -51,10 +51,24 @@ example {S}: P → Q → R → S ↔ ((P ∧ Q ∧ R) → S) := by
 /-!
 ## More examples
 -/
-#check lt_trans
 
-example (x y z : ℝ) (hab : x < y) (hbc: y < z) : x < z := by
-  apply lt_trans hab hbc
+/- I didnt find the tag trans -/
+#check Nat.lt_trans
+
+#check Nat.lt
+
+/-
+From ext to Prop?
+
+def test0 := [(0,1),(1,2),(2,3),(5,6)]
+def test1 := [(0,1),(1,2),(2,3),(0,2),(1,3),(0,3),(5,6)]
+
+def R (a b : Nat) (ext : List (Nat × Nat)) : Prop :=
+-/
+
+
+example (x y z : ℝ) (h₁ : x < y) (h₂: y < z) : x < z := by
+  apply lt_trans h₁ h₂
 
 example (a b c : ℝ) (hab : a < b) (hbc: b < c) : a < c := by
   trans b

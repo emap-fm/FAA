@@ -14,18 +14,22 @@ import Mathlib.Tactic
 -- New types can be created by defining a function between types
 #check ℕ → ℤ
 
+
 #check fun (x : ℕ) ↦ x
 #check fun (x : ℕ) ↦ (x : ℤ)
-#check fun (x : ℕ) ↦ (x^2 + x - 10 : ℤ)
+#check fun (x : ℕ) ↦ (x^2 + x - 10)
 
-def f' := fun (x : ℕ) ↦ (x^2 + x - 10: ℤ)
+def f' := fun (x : ℕ) ↦ (x^2 + x - 10 : ℤ)
 
 #check ℕ → ℕ → Prop
 #check fun x : ℕ ↦ fun y ↦ x = y
 
 def f := fun x : ℕ ↦ fun y : ℕ  ↦ x = y
+def f₁ := fun x y : ℕ  ↦ x = y
+
 #check f
 #check (f)
+#check (f₁)
 
 -- function can be partially applied
 #check f 0
@@ -42,7 +46,7 @@ example : f 0 0 := by rfl
 example (x : ℕ) : f 0 x → x = 0 := by
   intro h
   rw [f] at h
-  symm at h
+  symm
   assumption
 
 example (x : ℕ) : f 0 x → x = 0 := by
@@ -55,9 +59,10 @@ example (x : ℕ) : f 0 x → x = 0 := by
 
 example (x : ℕ) : f x 1 → x ≠ 2 := by
   rw [f]
-  intro h h1
+  intro h
+  intro h1
   rw [h] at h1
-  exact (Nat.succ_ne_self 1) h1.symm
+  exact (Nat.succ_ne_self 1) (h1.symm)
 
 example (x y: ℕ): f 0 x ∧ f 0 y → x = y := by
   repeat rw [f]
