@@ -12,10 +12,10 @@ set_option autoImplicit false
 
 /-!
 ## Induction Proofs
-  Let's say P: ℕ → Prop is a proposition indexed by a natural number. If you prove
-  · P 0
-  · ∀ i : ℕ, P i → P (i+1)
-  then P n holds for all natural numbers
+  Let's say P: ℕ → Prop is a proposition indexed by a natural number. If you
+  prove
+
+  · P 0 · ∀ i : ℕ, P i → P (i+1) then P n holds for all natural numbers
 
   In lean, you can use induction' tactics to do so.
 -/
@@ -30,8 +30,14 @@ def I : ℕ → ℕ
 #eval [I 0, I 1, I 2]
 
 -- running examples
-example (n:ℕ): I n = n := by
-  induction' n with n ih
+example (n : ℕ): I n = n := by
+  induction n with
+  | zero => rfl
+  | succ x ih =>
+    unfold I ; rw [ih]
+
+example (n : ℕ): I n = n := by
+  induction' n with x ih
   · rfl
   · unfold I
     rw [ih]
@@ -42,13 +48,16 @@ def I2 : ℕ → ℕ
   | n + 1 => I2 n + 2
 
 #eval [I2 0, I2 1, I2 2]
-example (n:ℕ): I2 n = 2*n := by sorry
+
+example (n : ℕ): I2 n = 2*n := by
+  induction' n with x ih
+  · rfl
+  · rw [I2, ih, Nat.mul_add]
 
 -- Another example
-example (n:ℕ): Even (I2 n) := by
+example (n : ℕ): Even (I2 n) := by
   induction' n with n ih
-  · rw [I2]
-    rw [Even]
+  · rw [I2, Even]
     use 0
   · unfold I2
     unfold Even
@@ -56,10 +65,27 @@ example (n:ℕ): Even (I2 n) := by
     obtain ⟨r ,hr⟩ := ih
     use (r+1)
     rw [hr]
-    omega
+    linarith
 
 -- Exercise 2
-theorem even_or_odd (n : ℕ) : (∃ k, n = 2*k) ∨ (∃ k, n = 2*k+1) := by sorry
+theorem even_or_odd (n : ℕ)
+  : (∃ k, n = 2*k) ∨ (∃ k, n = 2*k+1) := by
+  induction n with
+  | zero => left ; simp
+  | succ x ih =>
+    cases ih with
+    | inl h1 =>
+      right
+      obtain ⟨r, hr⟩ := h1
+      use r
+      rw [hr]
+    | inr h1 =>
+      left
+      obtain ⟨r, hr⟩ := h1
+      use r + 1
+      rw [hr]
+      linarith
+
 
 def S : ℕ → ℕ
   | 0 => 0
