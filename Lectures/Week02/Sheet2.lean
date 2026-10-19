@@ -23,9 +23,9 @@ variable (A B C D: Set α)
 
 -- Example: Left/Right tactics
 example : A ⊆ A ∪ B := by
-  rw [@subset_def]
+  rw [subset_def]
   intro x hx
-  rw [@mem_union]
+  rw [mem_union]
   left
   exact hx
 
@@ -50,7 +50,12 @@ example: ∀ x ∈ A ∪ B, x ∈ A ∪ B ∪ C:= by
 #check mem_union
 #check subset_def
 
-lemma my_union_subset_imp :  A ⊆ C ∧ B ⊆ C → A ∪ B ⊆ C := by sorry
+lemma my_union_subset_imp :  A ⊆ C ∧ B ⊆ C → A ∪ B ⊆ C := by
+  intro h1 x h2
+  cases h2
+  exact h1.1 h
+  exact h1.2 h
+
 
 -- Extend my_union_subset_imp to my_union_subset_iff
 -- You are allowed to use *only* these two lemmas.
@@ -76,19 +81,24 @@ lemma my_union_subset_iff:  A ⊆ C ∧ B ⊆ C ↔ A ∪ B ⊆ C := by
   exact hx
 
 -- Exercise 6: you may want to use my_union_subset_iff
-example : B ⊆ A → C ⊆ A → B ∪ C ⊆ A := by sorry
+example : B ⊆ A → C ⊆ A → B ∪ C ⊆ A := by
+  intro h1 h2
+  rw [← my_union_subset_iff]
+  exact ⟨h1, h2⟩
+
 
 /-! New tactics
- * `ext`  -- extensionality. Proving that two functions are identical. Since sets are functions in Lean, `ext` can be used to prove set equality.
+ * `ext`  -- extensionality. Proving that two functions are identical. Since
+   sets are functions in Lean, `ext` can be used to prove set equality.
 -/
 
 -- example
 lemma inter_comm: A ∩ B = B ∩ A := by
   ext x
   constructor
-  rintro ⟨a,b⟩
+  intro ⟨a,b⟩
   exact ⟨b,a⟩
-  rintro ⟨a,b⟩
+  intro ⟨a,b⟩
   exact ⟨b,a⟩
 
 -- example
@@ -104,4 +114,13 @@ lemma absorption_law: A ∩ (A ∪ B) = A := by
       exact a
 
 -- Exercise 7
-lemma union_comm : A ∪ B = B ∪ A := by sorry
+lemma union_comm : A ∪ B = B ∪ A := by
+  ext x
+  constructor <;> {
+    intro h
+    cases h
+    · right
+      assumption
+    · left
+      assumption
+  }
