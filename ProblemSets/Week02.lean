@@ -45,7 +45,8 @@ theorem P2 : A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) := by sorry
   Proof strategy for P3 is:
 -/
 
-theorem P3 : (A ∪ B) ∩ (A ∪ C) ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) ∪ (B ∩ C) := by sorry
+theorem P3 : (A ∪ B) ∩ (A ∪ C) ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) ∪ (B ∩ C) := by
+  sorry
 
 -- The set difference operation is denoted by B \ A
 -- This can be simplified using rw [mem_diff] where

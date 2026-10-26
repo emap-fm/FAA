@@ -83,17 +83,25 @@ example : ∅ ⊆ A := by
 -- Exercise 8: Transitivity of subset
 -- Hint: Use subset definition, then chain the implications
 example : A ⊆ B → B ⊆ C → A ⊆ C := by
-  sorry
+  intro h1 h2
+  trans B <;> assumption
 
 -- Exercise 9: Intersection subset
 -- Hint: Use subset and intersection definitions
-example : A ∩ B ⊆ B := by
-  sorry
+#check Set.inter_def
+#check Set.subset_def
 
--- Exercise 10: Subset intersection characterization
--- Hint: Use constructor to split the conjunction, then prove each direction
+example : A ∩ B ⊆ B := by
+  intro a ha
+  exact ha.2
+
+-- Exercise 10: Subset intersection characterization Hint: Use constructor to
+-- split the conjunction, then prove each direction
 example : A ⊆ B → A ⊆ C → A ⊆ B ∩ C := by
-  sorry
+  intro h1 h2
+  intro a ha
+  exact ⟨h1 ha, h2 ha⟩
+
 
 end SetBasics
 

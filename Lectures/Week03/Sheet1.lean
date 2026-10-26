@@ -9,13 +9,13 @@ import Lectures.Week03.Sheet0
 set_option autoImplicit false
 
 
-
 /-!
 ## Induction Proofs
   Let's say P: ℕ → Prop is a proposition indexed by a natural number. If you
   prove
 
-  · P 0 · ∀ i : ℕ, P i → P (i+1) then P n holds for all natural numbers
+  · P 0
+  · ∀ i : ℕ, P i → P (i+1) then P n holds for all natural numbers
 
   In lean, you can use induction' tactics to do so.
 -/
@@ -69,7 +69,7 @@ example (n : ℕ): Even (I2 n) := by
 
 -- Exercise 2
 theorem even_or_odd (n : ℕ)
-  : (∃ k, n = 2*k) ∨ (∃ k, n = 2*k+1) := by
+  : (∃ k, n = 2 * k) ∨ (∃ k, n = 2 * k + 1) := by
   induction n with
   | zero => left ; simp
   | succ x ih =>
@@ -91,16 +91,34 @@ def S : ℕ → ℕ
   | 0 => 0
   | n + 1 => S n + (n + 1)
 
-#eval S 1
-#eval S 2
-#eval S 3
+#eval [S 1, S 2, S 3]
 
 #check mul_comm
+#check mul_add
 
 -- Exercise 3
-lemma Sn_two (n : ℕ) : 2*(S n) = n * (n + 1)  := by sorry
+lemma Sn_two (n : ℕ) : 2 * (S n) = n * (n + 1)  := by
+  induction n with
+  | zero      => rfl
+  | succ a ih =>
+    rw [S, mul_add, ih]
+    rw [Nat.add_assoc a 1 1]
+    rw [mul_add (a + 1)]
+    rw [mul_comm (a + 1)]
+    rw [mul_comm (a + 1)]
 
-example (n : ℕ) : (S n) = n * (n + 1)/2  := by sorry
+example (n : ℕ) : (S n) = n * (n + 1)/2  := by
+  induction n with
+  | zero => rfl
+  | succ a ih =>
+    rw [S, ih]
+    have h1 := @Nat.mul_left_cancel_iff 2 (by simp)
+     (a * (a + 1) / 2 + (a + 1)) ((a + 1) * (a + 1 + 1) / 2)
+    rw [← h1]
+    rw [Nat.mul_add]
+    repeat rw [Nat.mul_div_cancel']
+    sorry
+
 
 -- It is much easier to work with type ℚ
 -- Example
