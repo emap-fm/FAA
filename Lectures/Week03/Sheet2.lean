@@ -25,22 +25,21 @@ def fib : Nat → Nat
 #eval fib 4
 #eval fib 5
 
--- Example
+
 example (x: ℕ): fib x ≤ 2^x := by
-  induction x using Nat.strong_induction_on
-  rename_i n h
+  induction' x using Nat.strong_induction_on with n h
   unfold fib
-  if h: n ≤ 1 then
+  if h1 : n ≤ 1 then
     split
     · norm_num
     · norm_num
     · contradiction
   else
-    simp at h
-    split <;> all_goals (simp)
+    simp at h1
+    split <;> try contradiction
     simp_all
     rename_i n x
-    have fxp: fib (x + 1) ≤ 2^(x+1) := by
+    have fxp : fib (x + 1) ≤ 2^(x + 1) := by
       apply h
       omega
     have fx : fib x ≤ 2^x := by
@@ -53,10 +52,17 @@ example (x: ℕ): fib x ≤ 2^x := by
 
 -- Exercise 5
 example (x: ℕ): fib x ≤ 2^x := by
-  induction x using Nat.twoStepInduction
-  · simp [fib]
-  · simp [fib]
-  · sorry
+  induction x using Nat.twoStepInduction with
+  | zero => simp [fib]
+  | one => simp [fib]
+  | more a h1 h2 =>
+    rw [fib]
+    grw [h1, h2]
+    nth_rw 2 [Nat.pow_add_one]
+    rw [Nat.mul_two]
+    -- gcongr 2 ^ (a + 1) + ?_
+    omega
+
 
 -- Define the following recurrence relation
 -- f (n) ≤ n + 2* f(n/2)

@@ -9,13 +9,13 @@ import Lectures.Week03.Sheet0
 set_option autoImplicit false
 
 
-
 /-!
 ## Induction Proofs
-  Let's say P: ℕ → Prop is a proposition indexed by a natural number. If you prove
-  · P 0
-  · ∀ i : ℕ, P i → P (i+1)
-  then P n holds for all natural numbers
+
+  Let's say P: ℕ → Prop is a proposition indexed by a natural number. If you
+  prove
+
+  · P 0 · ∀ i : ℕ, P i → P (i+1) then P n holds for all natural numbers
 
   In lean, you can use induction' tactics to do so.
 -/
@@ -42,7 +42,14 @@ def I2 : ℕ → ℕ
   | n + 1 => I2 n + 2
 
 #eval [I2 0, I2 1, I2 2]
-example (n:ℕ): I2 n = 2*n := by sorry
+
+example (n : ℕ) : I2 n = 2 * n := by
+  induction n with
+  | zero =>
+    rw [I2]
+  | succ a ih =>
+    rw [I2, ih, Nat.mul_add]
+
 
 -- Another example
 example (n:ℕ): Even (I2 n) := by
@@ -59,7 +66,21 @@ example (n:ℕ): Even (I2 n) := by
     omega
 
 -- Exercise 2
-theorem even_or_odd (n : ℕ) : (∃ k, n = 2*k) ∨ (∃ k, n = 2*k+1) := by sorry
+theorem even_or_odd (n : ℕ) : (∃ k, n = 2*k) ∨ (∃ k, n = 2*k+1) := by
+  induction' n with a ih
+  · left
+    use 0
+  · apply Or.elim ih
+    · intro h
+      obtain ⟨b, hb⟩ := h
+      right
+      use b
+      rw [hb]
+    · intro h
+      obtain ⟨b, hb⟩ := h
+      left
+      use b + 1
+      rw [hb, Nat.mul_add]
 
 def S : ℕ → ℕ
   | 0 => 0
@@ -96,9 +117,9 @@ notation:10000 n "!" => factorial n
 
 #eval [0!,1!,2!,3!,4!]
 
-/- Induction principle starting at a non-zero number.
-To use in an induction proof, the syntax is `induction n, hn using Nat.le_induction` (or the same
-for `induction'`). -/
+/- Induction principle starting at a non-zero number. To use in an induction
+proof, the syntax is `induction n, hn using Nat.le_induction` (or the same for
+`induction'`). -/
 
 #check Nat.le_induction
 
@@ -115,7 +136,20 @@ example : ∀ n ≥ 5, 2 ^ n > n ^ 2 := by
     exact power_two_ih n ih h
 
 -- Exercise 4
-lemma le_fact (n : ℕ) : 1 ≤ (n)! := by sorry
+lemma le_fact (n : ℕ) : 1 ≤ n ! := by
+  induction' n with x ih
+  · trivial
+  · rw [factorial]
+    grw [← ih]
+    omega
 
 -- Exercise 5
-example (n : ℕ) : 2^n ≤ (n+1)! := by sorry
+example (n : ℕ) : 2^n ≤ (n + 1)! := by
+  induction' n with a ih
+  · rw [Nat.pow_zero, factorial, factorial]
+  · rw [Nat.pow_add_one]
+    grw [ih]
+    nth_rw 2 [factorial]
+    rw [Nat.mul_comm]
+    gcongr
+    omega

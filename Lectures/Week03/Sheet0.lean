@@ -13,7 +13,9 @@ set_option pp.proofs true
 
 /-!
 ## Calculation Proofs
-Lean provides a powerful suite of "tactics" that can perform calculations, simplify expressions, and even solve entire goals automatically.
+
+Lean provides a powerful suite of "tactics" that can perform calculations,
+simplify expressions, and even solve entire goals automatically.
 -/
 
 /-! basic tactics
@@ -21,17 +23,21 @@ Lean provides a powerful suite of "tactics" that can perform calculations, simpl
 * `grw` -- same as rw [e], but e can be a relation other than = or ↔
 * `rel` -- apply `grw` to solve a relational goal by "substitution"
 * `rw??` -- specific rw by clicking in the info view
-* `gcongr` -- reduce a relational goal between a LHS and RHS matching the same pattern and outputs new simplified subgoals
+* `gcongr` -- reduce a relational goal between a LHS and RHS matching the same
+  pattern and outputs new simplified subgoals
 
 -- Solver
-* `norm_num` -- solve equalities/inequality involving literals (e.g., 3+1 ≤ 4, 1+1 = 2, 3 ≠ 4)
-* `ring` --   solve expressions in commutative (semi)rings, allowing for variables in the exponent.
+* `norm_num` -- solve equalities/inequality involving literals (e.g., 3+1 ≤ 4,
+  1+1 = 2, 3 ≠ 4)
+* `ring` --   solve expressions in commutative (semi)rings, allowing for
+  variables in the exponent.
 * `ring_nf` -- put the expression into a `normal' form
 * `omega` --  solve integer and natural linear arithmetic problems.
 * `linarith` -- solve linear arithmetic over the rationals
 
 -- Remark
-* `aesop` and `grind` -- too powerful automation (we will not use these two this week)
+* `aesop` and `grind` -- too powerful automation (we will not use these two this
+  week)
 -/
 
 
@@ -40,11 +46,6 @@ example : (1 : ℕ) + 1 ≠ 6 := by
 
 example : (3.141 : ℝ) + 2.718 = 5.859 := by
   norm_num
-
-example {a b x c d : ℝ} : x ^ 2 * a + c ≤ x ^ 2 * b + d := by
-  gcongr
-  sorry
-  sorry
 
 -- Example on grw/rel/gcongr
 example {a b x c d : ℝ} (h1 : a ≤ b) (h2 : c ≤ d) :
@@ -67,7 +68,8 @@ theorem power_two_ih (n : ℕ) (ih : 5 ≤ n) (h : 2 ^ n > n ^ 2) : 2 ^ (n + 1) 
             _ ≤ n * n := by grw [ih]
 
 --Alternate Proof
-theorem power_two_ih_alt (n : ℕ) (ih : 5 ≤ n) (h : 2 ^ n > n ^ 2) : 2 ^ (n + 1) > (n + 1) ^ 2 := by
+theorem power_two_ih_alt (n : ℕ) (ih : 5 ≤ n) (h : 2 ^ n > n ^ 2)
+  : 2 ^ (n + 1) > (n + 1) ^ 2 := by
    calc 2 ^ (n + 1) = 2 * 2 ^ n := by ring
     _ > 2 * n ^ 2 := by omega
     _ = n ^ 2 + n * n := by ring
@@ -77,11 +79,19 @@ theorem power_two_ih_alt (n : ℕ) (ih : 5 ≤ n) (h : 2 ^ n > n ^ 2) : 2 ^ (n +
     _ > n ^ 2 + 2 * n + 1 := by omega
     _ = (n + 1) ^ 2 := by ring
 
--- Exercise 1
--- try without omega
-theorem power_two_linear (n : ℕ) (ih : 3 ≤ n) (h : 2*n < 2^n) : 2*(n+1) < 2^(n+1) := by
- sorry
 
--- Exericse 2
--- prove this without omega
-example (n:ℕ ) (h: 5 ≤ n): 1 + n * 2 < 5*n := by sorry
+-- Exercise 1: try without omega
+theorem power_two_linear (n : ℕ) (ih : 3 ≤ n) (h : 2 * n < 2^n)
+  : 2 * (n + 1) < 2^(n + 1) := by
+  rw [Nat.mul_add 2, Nat.mul_one]
+  grw [h]
+  rw [Nat.pow_add, Nat.pow_one]
+  rw [Nat.mul_two]
+  gcongr
+  grw [← ih]
+  linarith
+  exact NeZero.one_le
+
+
+-- Exericse 2: prove this without omega
+example (n : ℕ) (h: 5 ≤ n): 1 + n * 2 < 5 * n := by sorry
