@@ -53,10 +53,18 @@ example (x: ℕ): fib x ≤ 2^x := by
 
 -- Exercise 5
 example (x: ℕ): fib x ≤ 2^x := by
-  induction x using Nat.twoStepInduction
+  induction' x using Nat.twoStepInduction with n ih₁ ih₂
   · simp [fib]
   · simp [fib]
-  · sorry
+  · rw [fib]
+    calc fib (n + 1) + fib n ≤ 2^(n + 1) + 2^n := by grw [ih₁, ih₂]
+        _ ≤ 2^(n + 1) + 2 * 2^n := by linarith
+        _ ≤ 2 ^ (n + 1) + 2 ^ (n + 1) := by omega
+        _ ≤ 2 * 2 ^ (n + 1) := by linarith
+        _ ≤ 2 ^ (n + 2) := by
+         rewrite (occs := .pos [1]) [← Nat.pow_one 2]
+         rw [← Nat.pow_add]
+         grind only
 
 -- Define the following recurrence relation
 -- f (n) ≤ n + 2* f(n/2)
@@ -72,7 +80,7 @@ def f_closed (n : ℕ) : ℚ := n * (Nat.log 2 n)+n
 #eval (List.map f_closed [0,1,2,3,4,5,6,7,8])
 
 -- Example
- example (n :ℕ): f (2^n) ≤ (n+1)*2^n   := by
+ example (n : ℕ): f (2^n) ≤ (n+1)*2^n   := by
   induction' n with i ih
   · simp [f]
   · unfold f
@@ -87,11 +95,17 @@ def f_closed (n : ℕ) : ℚ := n * (Nat.log 2 n)+n
 -- Exercise 6: the cost of binary search
 def g (n : ℕ): ℕ :=
   if n = 0 then 0
-  else g (n/2) + 1
+  else g (n / 2) + 1
 
-def g_close (n :ℕ ) : ℕ  :=  Nat.log 2 n + 1
+def g_close (n : ℕ) : ℕ  :=  Nat.log 2 n + 1
 
 #eval (List.map g [0,1,2,3,4,5,6,7,8,1000])
 #eval (List.map g_close [0,1,2,3,4,5,6,7,8,1000])
 
-example (n :ℕ): g (2^n) ≤ n+1 := by sorry
+#check Nat.div2Induction
+
+example (n : ℕ): g (2^n) ≤ n + 1 := by
+  induction' n with a h
+  · simp; simp [g]
+  · simp [Nat.pow_add]
+    rw [g]; simp; trivial -- why simp [g] fails!!!

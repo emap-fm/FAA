@@ -107,18 +107,14 @@ lemma Sn_two (n : ℕ) : 2 * (S n) = n * (n + 1)  := by
     rw [mul_comm (a + 1)]
     rw [mul_comm (a + 1)]
 
-example (n : ℕ) : (S n) = n * (n + 1)/2  := by
-  induction n with
-  | zero => rfl
-  | succ a ih =>
-    rw [S, ih]
-    have h1 := @Nat.mul_left_cancel_iff 2 (by simp)
-     (a * (a + 1) / 2 + (a + 1)) ((a + 1) * (a + 1 + 1) / 2)
-    rw [← h1]
-    rw [Nat.mul_add]
-    repeat rw [Nat.mul_div_cancel']
-    sorry
+#check mul_div_cancel
+#check Nat.mul_div_cancel
+#check Nat.mul_div_cancel'
+#check Nat.mul_div_cancel_left (n := 2)
 
+example (n : ℕ) : (S n) = n * (n + 1)/2  := by
+  rw [← Sn_two]
+  simp only [Nat.mul_div_cancel_left, Nat.ofNat_pos]
 
 -- It is much easier to work with type ℚ
 -- Example
@@ -153,10 +149,9 @@ for `induction'`). -/
 -- Example
 example : ∀ n ≥ 5, 2 ^ n > n ^ 2 := by
   intro n h
-  induction' n,h using Nat.le_induction with n ih
+  induction' n, h using Nat.le_induction with a ih h
   · simp
-  · rename_i h
-    exact power_two_ih n ih h
+  · exact power_two_ih a ih h
 
 -- Exercise 4
 lemma le_fact (n : ℕ) : 1 ≤ (n)! := by sorry

@@ -11,7 +11,6 @@ set_option tactic.hygienic false
 
 -- Lean defines the notation [] for nil and :: for cons,
 example : [1,2,3] = 1 :: 2 :: 3 :: [] := by grind
-
 def append {α : Type} : List α → List α → List α
 | [], bs => bs
 | a :: as, bs => a :: (append as bs)
